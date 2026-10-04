@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sky Runner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='game.css') }}" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <aside class="sidebar-panel">
+        <div class="brand-wrap">
+          <div class="brand-icon">✦</div>
+          <div>
+            <p class="eyebrow">Arcade</p>
+            <h1>Sky Runner</h1>
+          </div>
+        </div>
+
+        <p class="subtitle">Salva la ruta, recoge energía y evita los asteroides.</p>
+
+        <div class="score-grid">
+          <div class="info-box">
+            <span>Puntuación</span>
+            <strong id="score">0</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Mejor</span>
+            <strong id="bestScore">0</strong>
+          </div>
+
+          <div class="info-box highlight">
+            <span>Vidas</span>
+            <strong id="lives">3</strong>
+          </div>
+        </div>
+
+        <div class="mission-box">
+          <h2>Misión</h2>
+          <p>Recolecta estrellas y mantente vivo el mayor tiempo posible.</p>
+        </div>
+
+        <div class="controls">
+          <h2>Controles</h2>
+          <ul>
+            <li>Mouse o teclado: mover con flechas / WASD</li>
+            <li>Touch: usa los botones de abajo</li>
+            <li>Espacio para empezar o reiniciar</li>
+          </ul>
+        </div>
+
+        <button id="startBtn" class="start-button">Iniciar partida</button>
+      </aside>
+
+      <main class="game-panel">
+        <div class="hud-top">
+          <div class="badge">Nivel 01</div>
+          <div class="badge soft">Modo arcade</div>
+        </div>
+
+        <canvas id="gameCanvas" width="900" height="500"></canvas>
+
+        <div id="messageOverlay" class="message-overlay visible">
+          <div class="dialog-box">
+            <p class="eyebrow light">Bienvenido</p>
+            <h2>Sky Runner</h2>
+            <p>Recoge estrellas y evita los asteroides.</p>
+          </div>
+        </div>
+
+        <div class="mobile-controls" aria-label="Controles táctiles">
+          <button data-key="ArrowUp" aria-label="Subir">▲</button>
+          <div class="mobile-row">
+            <button data-key="ArrowLeft" aria-label="Izquierda">◀</button>
+            <button data-key="ArrowDown" aria-label="Bajar">▼</button>
+            <button data-key="ArrowRight" aria-label="Derecha">▶</button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
+  </body>
+</html>

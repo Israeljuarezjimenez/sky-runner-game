@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de Proyectos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
+          <div>
+            <p class="eyebrow">Workspace</p>
+            <h1>Proyecto</h1>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <a class="active" href="#">Dashboard</a>
+          <a href="#">Tareas</a>
+          <a href="#">Resumen</a>
+          <a href="#">Configuración</a>
+        </nav>
+
+        <div class="mini-card">
+          <p>Estado general</p>
+          <strong>{{ summary.completed }}/{{ summary.total }} finalizadas</strong>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Panel de control</p>
+            <h2>Gestión de tareas</h2>
+          </div>
+          <div class="clock">{{ now.strftime('%d/%m/%Y') }}</div>
+        </header>
+
+        <section class="stats-grid">
+          <article class="stat-card accent-primary">
+            <span>Total</span>
+            <strong>{{ summary.total }}</strong>
+            <small>Tareas registradas</small>
+          </article>
+          <article class="stat-card accent-success">
+            <span>Completadas</span>
+            <strong>{{ summary.completed }}</strong>
+            <small>Cumplidas</small>
+          </article>
+          <article class="stat-card accent-warning">
+            <span>Pendientes</span>
+            <strong>{{ summary.pending }}</strong>
+            <small>En progreso</small>
+          </article>
+          <article class="stat-card accent-danger">
+            <span>Urgentes</span>
+            <strong>{{ summary.urgent }}</strong>
+            <small>Alta prioridad</small>
+          </article>
+        </section>
+
+        <section class="progress-strip panel">
+          <div>
+            <p class="eyebrow">Avance</p>
+            <strong>{{ summary.progress }}%</strong>
+          </div>
+          <div class="progress-bar">
+            <span style="width: {{ summary.progress }}%"></span>
+          </div>
+        </section>
+
+        <section class="content-grid">
+          <div class="panel form-panel">
+            <div class="panel-header">
+              <h3>Nueva tarea</h3>
+            </div>
+
+            <form action="{{ url_for('add_task') }}" method="POST" class="task-form">
+              <label>
+                Título
+                <input type="text" name="title" placeholder="Ej. Revisar cronograma" required />
+              </label>
+
+              <label>
+                Descripción
+                <textarea name="description" rows="3" placeholder="Describe la tarea..."></textarea>
+              </label>
+
+              <div class="inline-fields">
+                <label>
+                  Prioridad
+                  <select name="priority">
+                    <option value="alta">Alta</option>
+                    <option value="media" selected>Media</option>
+                    <option value="baja">Baja</option>
+                  </select>
+                </label>
+
+                <label>
+                  Categoría
+                  <input type="text" name="category" placeholder="Ej. Marketing" />
+                </label>
+              </div>
+
+              <label>
+                Fecha de entrega
+                <input type="date" name="due_date" />
+              </label>
+
+              <button type="submit" class="primary-btn">Guardar tarea</button>
+            </form>
+          </div>
+
+          <div class="panel list-panel">
+            <div class="panel-header">
+              <h3>Listado</h3>
+              <span>{{ summary.pending }} pendientes</span>
+            </div>
+
+            <form class="filters" method="GET" action="{{ url_for('index') }}">
+              <div class="filter-row">
+                <button type="submit" name="filter" value="all" class="filter-btn {% if active_filter == 'all' %}active{% endif %}">Todas</button>
+                <button type="submit" name="filter" value="pending" class="filter-btn {% if active_filter == 'pending' %}active{% endif %}">Pendientes</button>
+                <button type="submit" name="filter" value="completed" class="filter-btn {% if active_filter == 'completed' %}active{% endif %}">Completadas</button>
+                <button type="submit" name="filter" value="priority" class="filter-btn {% if active_filter == 'priority' %}active{% endif %}">Urgentes</button>
+              </div>
+              <input type="search" name="search" value="{{ search }}" placeholder="Buscar por tarea, descripción o categoría" />
+            </form>
+
+            <div class="task-list">
+              {% for task in tasks %}
+                <article class="task-item {% if task.completed %}done{% endif %}">
+                  <div class="task-main">
+                    <div class="task-topline">
+                      <h4>{{ task.title }}</h4>
+                      <span class="priority priority-{{ task.priority }}">{{ task.priority }}</span>
+                    </div>
+                    <p>{{ task.description }}</p>
+                    <div class="task-meta">
+                      <span class="meta-badge">{{ task.category or 'General' }}</span>
+                      <span class="meta-badge">{{ task.due_date or 'Sin fecha' }}</span>
+                    </div>
+                    <small>{{ task.created_at }}</small>
+                  </div>
+
+                  <div class="task-actions">
+                    <form action="{{ url_for('toggle_task', task_id=task.id) }}" method="POST">
+                      <button type="submit" class="secondary-btn">
+                        {% if task.completed %}Reabrir{% else %}Completar{% endif %}
+                      </button>
+                    </form>
+                    <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST">
+                      <button type="submit" class="danger-btn">Eliminar</button>
+                    </form>
+                  </div>
+                </article>
+              {% else %}
+                <div class="empty-state">
+                  <p>No hay tareas registradas con esos filtros.</p>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+
+        <section class="panel chat-panel">
+          <div class="panel-header">
+            <h3>Asistente IA</h3>
+            <span>Chat en español</span>
+          </div>
+
+          <div id="chatMessages" class="chat-messages">
+            <div class="message bot">
+              Hola, soy tu asistente de IA. Puedo ayudarte con tareas, prioridades y resumen del proyecto.
+            </div>
+          </div>
+
+          <form id="chatForm" class="chat-form">
+            <input id="chatInput" type="text" placeholder="Escribe tu pregunta..." autocomplete="off" required />
+            <button type="submit" class="primary-btn">Enviar</button>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
